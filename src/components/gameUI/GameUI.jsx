@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import styles from "./GameUI.module.css";
 import skyResort from "/waldo-at-sky-resort.jpg";
 import FloatingBox from "../floatingBox/FloatingBox";
+import PuzzleList from "../puzzleList/PuzzleList";
 
 const GameUI = () => {
+  const [image, setImage] = useState(null);
+  const [puzzles, setPuzzles] = useState(null);
   const [isBoxActive, setIsBoxActive] = useState(false);
   const [coord, setCoord] = useState({ x: null, y: null });
   const [imgDimension, setImgDimension] = useState({
@@ -32,29 +35,44 @@ const GameUI = () => {
     console.log({ imgDimension, coord });
   }
 
-  const [image, setImage] = useState(null);
-
   useEffect(() => {
-    async function fetchImage() {
+    async function fetchImages() {
       // 66120130d8629c3cae7a2ff2
       // 6619fe540d3b850b470af171
-      const result = await fetch(
-        "http://localhost:3000/v1/image/66120130d8629c3cae7a2ff2"
-      );
-      const resultJSON = await result.json();
-      const imageData = resultJSON.image;
+      const [imgResult, puzzlesResult] = await Promise.all([
+        // fetch("http://localhost:3000/v1/image/66120130d8629c3cae7a2ff2")
+        1,
+        fetch(
+          "http://localhost:3000/v1/image/66120130d8629c3cae7a2ff2/puzzles"
+        ),
+      ]);
+      const [imgJSON, puzzlesJSON] = await Promise.all([
+        // imgResult.json()
+        imgResult,
+        puzzlesResult.json(),
+      ]);
+      const imageData = imgJSON.image;
 
-      setImage(imageData);
+      console.log({ imgJSON, puzzlesJSON });
+      !puzzlesJSON.error && setPuzzles(puzzlesJSON.puzzles);
+      !imgJSON.error && setImage(imgJSON.image);
     }
 
-    fetchImage();
+    fetchImages();
 
-    return setImage(null);
+    return () => {
+      setImage(null), setPuzzles(null);
+    };
   }, []);
 
   return (
     <div className={styles.gameUI}>
       <h1>Find waldo!</h1>
+      {puzzles !== null ? (
+        <PuzzleList puzzles={puzzles} />
+      ) : (
+        <div> loading ...</div>
+      )}
       <div className={styles.imgContainer}>
         {isBoxActive ? (
           <FloatingBox
