@@ -1,4 +1,5 @@
 import styles from "./FloatingBox.module.css";
+import PropTypes from "prop-types";
 
 const FloatingBox = ({ imgDimension, coord, validArea }) => {
   const leftPercentage =
@@ -22,6 +23,12 @@ const FloatingBox = ({ imgDimension, coord, validArea }) => {
       style={{ top: top, left: left, height: heightCSS, width: widthCSS }}
     ></div>
   );
+};
+
+FloatingBox.propTypes = {
+  imgDimension: PropTypes.objectOf(PropTypes.number),
+  coord: PropTypes.objectOf(PropTypes.number),
+  validArea: PropTypes.number,
 };
 
 export default FloatingBox;
