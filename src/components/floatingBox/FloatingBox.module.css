@@ -1,0 +1,4 @@
+.floatingBox {
+  position: absolute;
+  border: 3px red solid;
+}
