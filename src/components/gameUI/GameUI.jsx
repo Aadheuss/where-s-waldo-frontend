@@ -13,6 +13,10 @@ const GameUI = () => {
     width: null,
     height: null,
   });
+  const [imgOrgDimension, setOrgImageDimension] = useState({
+    width: null,
+    height: null,
+  });
   const validArea = 1 / 20;
 
   function activateBox(e) {
@@ -26,13 +30,17 @@ const GameUI = () => {
       x: coordX,
       y: coordY,
     });
+    setOrgImageDimension({
+      ...imgDimension,
+      width: e.target.naturalWidth,
+      height: e.target.naturalHeight,
+    });
     setImgDimension({
       ...imgDimension,
       width: e.target.clientWidth,
       height: e.target.clientHeight,
     });
-    setIsBoxActive(true);
-    console.log({ imgDimension, coord });
+    setIsBoxActive(!isBoxActive);
   }
 
   useEffect(() => {
@@ -54,7 +62,12 @@ const GameUI = () => {
       const imageData = imgJSON.image;
 
       console.log({ imgJSON, puzzlesJSON });
-      !puzzlesJSON.error && setPuzzles(puzzlesJSON.puzzles);
+      !puzzlesJSON.error &&
+        setPuzzles(
+          puzzlesJSON.puzzles.map((puzzle) => {
+            return { ...puzzle, status: false };
+          })
+        );
       !imgJSON.error && setImage(imgJSON.image);
     }
 
@@ -77,8 +90,11 @@ const GameUI = () => {
         {isBoxActive ? (
           <FloatingBox
             coord={{ coordX: coord.x, coordY: coord.y }}
+            imgOrgDimension={imgOrgDimension}
             imgDimension={imgDimension}
             validArea={validArea}
+            puzzles={puzzles}
+            puzzlesOnClick={setPuzzles}
           />
         ) : null}
         <img
